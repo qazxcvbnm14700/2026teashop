@@ -1,0 +1,538 @@
+/* ==========================================================================
+   TP TEA × plantica 風格設計系統 (米杏、典雅炭棕、淡雅花卉粉、植萃墨綠)
+   ========================================================================== */
+
+:root {
+  --bg-primary: #FAF7F2;
+  --bg-card: #FFFFFF;
+  --bg-subtle: #F4EFEA;
+  --bg-accent: #EFE7DE;
+  
+  --text-main: #2D251E;
+  --text-muted: #736557;
+  --text-light: #9B8D7E;
+  
+  --brand-green: #3D5A45;
+  --brand-green-light: #4F7359;
+  --brand-brown: #5C4533;
+  --brand-pink: #D98880;
+  --brand-pink-subtle: #FBEBE8;
+  --brand-accent: #C85A32;
+  
+  --border-color: #E8DFD5;
+  --border-focus: #3D5A45;
+  
+  --shadow-sm: 0 2px 8px rgba(92, 69, 51, 0.05);
+  --shadow-md: 0 6px 20px rgba(92, 69, 51, 0.08);
+  --shadow-lg: 0 12px 32px rgba(92, 69, 51, 0.12);
+  
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-full: 9999px;
+
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* 頂部導覽列 */
+.navbar {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-color);
+  padding: 14px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-badge {
+  background: var(--brand-brown);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 1px;
+}
+
+.brand-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.5px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 12px;
+}
+
+.nav-btn {
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+}
+
+.nav-btn:hover {
+  background: var(--bg-subtle);
+  color: var(--text-main);
+}
+
+.nav-btn.active {
+  background: var(--brand-green);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(61, 90, 69, 0.3);
+}
+
+/* 主容器排版：依據 prompt 規範由上而下以列為單位 */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* 列 1：菜單區塊 */
+.row-menu {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--bg-subtle);
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--brand-brown);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* 菜單圖片：等比例縮放，不可裁切 */
+.menu-image-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f7f4ee;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.menu-image-wrapper img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain; /* 確保等比例縮放不裁切 */
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+/* 列 2：表單 | 價格 (左右兩區塊) */
+.row-form-pricing {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .row-form-pricing {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 區塊卡片共通樣式 */
+.block-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+}
+
+/* 表單區塊內部元件 */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.required-badge {
+  color: var(--brand-accent);
+  margin-left: 4px;
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: #FAFAFA;
+  color: var(--text-main);
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  background-color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(61, 90, 69, 0.12);
+}
+
+/* 分類標籤頁（Tab）篩選友好體驗 */
+.category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tab-btn {
+  padding: 6px 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  border-color: var(--brand-green);
+  color: var(--brand-green);
+}
+
+.tab-btn.active {
+  background: var(--brand-green);
+  color: #fff;
+  border-color: var(--brand-green);
+}
+
+/* 餐點格狀選單 */
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.item-card {
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  cursor: pointer;
+  background: #FFF;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.item-card:hover {
+  border-color: var(--brand-green-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.item-card.selected {
+  border-color: var(--brand-green);
+  background-color: #F3F7F4;
+  box-shadow: 0 0 0 2px rgba(61, 90, 69, 0.25);
+}
+
+.item-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.item-tag {
+  display: inline-block;
+  background: var(--brand-pink);
+  color: #FFF;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+
+.item-price {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--brand-accent);
+}
+
+/* 規格客製化（冷熱尺寸、甜度、冰量、加料） */
+.customization-box {
+  background: var(--bg-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.radio-pills, .checkbox-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill-option {
+  position: relative;
+}
+
+.pill-option input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.pill-option label {
+  display: inline-block;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pill-option label:hover {
+  border-color: var(--brand-green);
+}
+
+.pill-option input:checked + label {
+  background: var(--brand-green);
+  color: #FFFFFF;
+  border-color: var(--brand-green);
+}
+
+/* 價格區塊（右側黏性 Sticky 側邊欄） */
+.pricing-sidebar {
+  position: sticky;
+  top: 86px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.price-summary-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  border: 1.5px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+}
+
+.summary-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--brand-brown);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1.5px dashed var(--border-color);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.summary-row.total-row {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 2px solid var(--bg-subtle);
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.total-amount {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--brand-accent);
+}
+
+.submit-btn {
+  width: 100%;
+  background: var(--brand-green);
+  color: #FFFFFF;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(61, 90, 69, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.submit-btn:hover {
+  background: var(--brand-green-light);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(61, 90, 69, 0.35);
+}
+
+.submit-btn:disabled {
+  background: #CCC;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 狀態訊息提示 */
+.alert-box {
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  display: none;
+}
+
+.alert-success {
+  background: #EAF5ED;
+  color: #246B3B;
+  border: 1px solid #C4E5CE;
+}
+
+.alert-error {
+  background: #FDF0ED;
+  color: #B83A24;
+  border: 1px solid #F6CEC4;
+}
+
+/* 訂單查詢列表頁專屬樣式 */
+.orders-table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: #FFFFFF;
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.orders-table th {
+  background: var(--bg-subtle);
+  color: var(--brand-brown);
+  padding: 12px 14px;
+  font-weight: 700;
+  border-bottom: 2px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.orders-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.orders-table tr:hover {
+  background-color: #FBF9F6;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--brand-green);
+}

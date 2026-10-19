@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>點餐狀況檢視 - TP TEA × plantica 班級飲料點餐系統</title>
+  <meta name="description" content="即時查看目前班級學生的飲料點餐狀況、品項統計與總金額">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- 頂部導覽列 -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <span class="brand-badge">TP TEA × plantica</span>
+      <h1 class="brand-title">點餐狀況檢視</h1>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-btn" id="nav-order-btn">我要點餐</a>
+      <a href="orders.html" class="nav-btn active" id="nav-status-btn">點餐狀況檢視</a>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <!-- 統計概覽數據 -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">已登記人數 / 筆數</div>
+        <div class="stat-value" id="stat-total-count">0 筆</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">飲料杯數 / 份數合計</div>
+        <div class="stat-value" id="stat-total-qty">0 杯</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">目前總金額</div>
+        <div class="stat-value" id="stat-total-amount" style="color: var(--brand-accent);">NT$ 0</div>
+      </div>
+    </section>
+
+    <!-- 訂單明細列表 -->
+    <section class="block-card">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span>📋</span> 目前點餐清單
+        </h2>
+        <div>
+          <button id="refresh-orders-btn" class="nav-btn" style="border: 1px solid var(--border-color); background: var(--bg-subtle); cursor: pointer;">
+            🔄 重新整理
+          </button>
+          <button id="clear-local-orders-btn" class="nav-btn" style="border: 1px solid var(--border-color); color: #B83A24; cursor: pointer;">
+            🗑️ 清除本機快取
+          </button>
+        </div>
+      </div>
+
+      <div class="orders-table-wrapper">
+        <table class="orders-table" id="orders-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>姓名</th>
+              <th>餐點類別</th>
+              <th>品項名稱</th>
+              <th>規格/溫層</th>
+              <th>甜度</th>
+              <th>冰量</th>
+              <th>加料</th>
+              <th>單價</th>
+              <th>數量</th>
+              <th>總金額</th>
+              <th>備註</th>
+              <th>時間</th>
+            </tr>
+          </thead>
+          <tbody id="orders-table-body">
+            <tr>
+              <td colspan="13" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                資料讀取中...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="js/storage.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      loadAndRenderOrders();
+
+      document.getElementById("refresh-orders-btn").onclick = () => {
+        loadAndRenderOrders();
+      };
+
+      document.getElementById("clear-local-orders-btn").onclick = () => {
+        if (confirm("確定要清空本機的所有暫存點餐紀錄嗎？")) {
+          localStorage.removeItem("tea_shop_local_orders");
+          loadAndRenderOrders();
+        }
+      };
+    });
+
+    async function loadAndRenderOrders() {
+      const tbody = document.getElementById("orders-table-body");
+      tbody.innerHTML = `<tr><td colspan="13" style="text-align: center; padding: 24px; color: var(--text-muted);">正在載入點餐紀錄...</td></tr>`;
+
+      const orders = await fetchOrders();
+
+      if (!orders || orders.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="13" style="text-align: center; padding: 36px; color: var(--text-muted);">目前尚無點餐資料，歡迎從「我要點餐」提交！</td></tr>`;
+        updateStats(0, 0, 0);
+        return;
+      }
+
+      let totalCount = orders.length;
+      let totalQty = 0;
+      let totalAmount = 0;
+
+      tbody.innerHTML = "";
+      orders.forEach((order, index) => {
+        const qty = Number(order.quantity) || 1;
+        const total = Number(order.totalPrice) || (Number(order.unitPrice) * qty) || 0;
+        
+        totalQty += qty;
+        totalAmount += total;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td><strong>${order.name || "-"}</strong></td>
+          <td><span style="font-size: 0.8rem; background: var(--bg-subtle); padding: 2px 8px; border-radius: 4px;">${order.category || "-"}</span></td>
+          <td><strong>${order.item || "-"}</strong></td>
+          <td>${order.tempSize || "-"}</td>
+          <td>${order.sweetness || "-"}</td>
+          <td>${order.ice || "-"}</td>
+          <td>${order.toppings || "無"}</td>
+          <td>NT$ ${order.unitPrice || 0}</td>
+          <td>${qty}</td>
+          <td style="color: var(--brand-accent); font-weight: bold;">NT$ ${total}</td>
+          <td style="color: var(--text-muted); font-size: 0.85rem;">${order.note || "無"}</td>
+          <td style="color: var(--text-light); font-size: 0.8rem;">${order.timestamp || "-"}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      updateStats(totalCount, totalQty, totalAmount);
+    }
+
+    function updateStats(count, qty, amount) {
+      document.getElementById("stat-total-count").textContent = `${count} 筆`;
+      document.getElementById("stat-total-qty").textContent = `${qty} 杯/份`;
+      document.getElementById("stat-total-amount").textContent = `NT$ ${amount}`;
+    }
+  </script>
+</body>
+</html>

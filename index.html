@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TP TEA × plantica 班級飲料點餐系統</title>
+  <meta name="description" content="根據 TP TEA × plantica 聯名菜單設計之班級學生飲料點餐系統，支援即時價格計算與 Google Sheet 存檔">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- 頂部導覽列 -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <span class="brand-badge">TP TEA × plantica</span>
+      <h1 class="brand-title">班級手搖飲點餐</h1>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-btn active" id="nav-order-btn">我要點餐</a>
+      <a href="orders.html" class="nav-btn" id="nav-status-btn">點餐狀況檢視</a>
+    </nav>
+  </header>
+
+  <!-- 主內容容器：依 prompt 規範由上而下以列為單位 -->
+  <main class="container">
+
+    <!-- 第 1 列：菜單 -->
+    <section class="row-menu" id="section-menu">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span>📋</span> 菜單瀏覽
+        </h2>
+        <span class="section-desc">TP TEA × plantica 聯名限定菜單 (等比例縮放)</span>
+      </div>
+      <div class="menu-image-wrapper">
+        <img src="menu.jpg" alt="TP TEA × plantica 菜單" id="menu-image">
+      </div>
+    </section>
+
+    <!-- 第 2 列：表單 | 價格 -->
+    <section class="row-form-pricing" id="section-form-pricing">
+
+      <!-- 左側區塊：表單 -->
+      <div class="block-card form-block">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span>📝</span> 填寫點餐內容
+          </h2>
+          <span class="section-desc">請選取品項並填寫學生姓名</span>
+        </div>
+
+        <form id="order-form">
+          <!-- 姓名輸入 -->
+          <div class="form-group">
+            <label class="form-label" for="customer-name">
+              學生姓名 / 座號 <span class="required-badge">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="customer-name" 
+              class="form-input" 
+              placeholder="請輸入您的姓名（例如：王小明 或 05號小美）" 
+              required
+            >
+          </div>
+
+          <!-- 分類選擇 Tab -->
+          <div class="form-group">
+            <label class="form-label">選擇系列分類</label>
+            <div class="category-tabs" id="category-tabs-container">
+              <!-- JS 動態生成分類按鈕 -->
+            </div>
+          </div>
+
+          <!-- 餐點項目清單 (根據 menu.jpg 內容友善呈現) -->
+          <div class="form-group">
+            <label class="form-label">選擇餐點項目 <span class="required-badge">*</span></label>
+            <div class="items-grid" id="items-grid-container">
+              <!-- JS 動態渲染所有餐點卡片 -->
+            </div>
+          </div>
+
+          <!-- 規格選項（冷熱/尺寸、甜度、冰量、加料） -->
+          <div class="customization-box" id="customization-box">
+            
+            <!-- 冷熱 / 規格尺寸 -->
+            <div class="form-group">
+              <label class="form-label">規格 / 溫層</label>
+              <div class="radio-pills" id="temp-size-container">
+                <!-- JS 動態生成 -->
+              </div>
+            </div>
+
+            <!-- 甜度調整 (僅飲料適用) -->
+            <div class="form-group" id="sweetness-group">
+              <label class="form-label">甜度選擇</label>
+              <div class="radio-pills" id="sweetness-container">
+                <!-- JS 動態生成 -->
+              </div>
+            </div>
+
+            <!-- 冰量調整 (僅飲料適用) -->
+            <div class="form-group" id="ice-group">
+              <label class="form-label">冰量選擇</label>
+              <div class="radio-pills" id="ice-container">
+                <!-- JS 動態生成 -->
+              </div>
+            </div>
+
+            <!-- 配料加選 -->
+            <div class="form-group" id="toppings-group">
+              <label class="form-label">加料選購 (可複選)</label>
+              <div class="checkbox-pills" id="toppings-container">
+                <!-- JS 動態生成加料項目 -->
+              </div>
+            </div>
+
+            <!-- 數量與備註 -->
+            <div style="display: grid; grid-template-columns: 140px 1fr; gap: 16px;">
+              <div class="form-group">
+                <label class="form-label" for="item-quantity">數量</label>
+                <input type="number" id="item-quantity" class="form-input" value="1" min="1" max="50">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="item-note">特別備註</label>
+                <input type="text" id="item-note" class="form-input" placeholder="例如：自備環保杯、雞蛋糕要現吃...">
+              </div>
+            </div>
+
+          </div>
+
+          <div id="submit-alert" class="alert-box"></div>
+        </form>
+      </div>
+
+      <!-- 右側區塊：價格 -->
+      <aside class="pricing-sidebar">
+        <div class="price-summary-card">
+          <h3 class="summary-title">點餐明細與即時價格</h3>
+
+          <div class="summary-row">
+            <span>已選品項：</span>
+            <strong id="summary-item-name" style="color: var(--text-main);">尚未選取</strong>
+          </div>
+          <div class="summary-row">
+            <span>單品基礎價格：</span>
+            <span id="summary-base-price">NT$ 0</span>
+          </div>
+          <div class="summary-row">
+            <span>加料合計：</span>
+            <span id="summary-toppings-price">+ NT$ 0</span>
+          </div>
+          <div class="summary-row">
+            <span>單品單價：</span>
+            <span id="summary-unit-price">NT$ 0</span>
+          </div>
+          <div class="summary-row">
+            <span>訂購數量：</span>
+            <span id="summary-quantity">1 杯/份</span>
+          </div>
+
+          <div class="summary-row total-row">
+            <span>總金額：</span>
+            <span class="total-amount" id="summary-total-price">NT$ 0</span>
+          </div>
+
+          <div style="margin-top: 20px;">
+            <button type="button" class="submit-btn" id="submit-order-btn">
+              <span>確認送出點餐</span>
+            </button>
+          </div>
+
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 14px; text-align: center;">
+            點擊送出後即時儲存於「2026手搖飲點餐記錄」
+          </p>
+        </div>
+
+        <!-- Google Sheet 設定小抽屜 (方便使用者切換或填入 Apps Script 網址) -->
+        <div class="block-card" style="padding: 16px; font-size: 0.85rem;">
+          <details>
+            <summary style="cursor: pointer; font-weight: bold; color: var(--brand-brown);">
+              ⚙️ Google Sheet 串接設定 (點擊展開)
+            </summary>
+            <div style="margin-top: 10px;">
+              <p style="color: var(--text-muted); margin-bottom: 6px;">
+                若已在 Google Sheet 部署 Apps Script，可在此貼上 Web App 網址：
+              </p>
+              <input type="text" id="api-url-input" class="form-input" style="font-size: 0.8rem; padding: 6px 10px;" placeholder="https://script.google.com/macros/s/.../exec">
+              <button type="button" id="save-api-url-btn" class="nav-btn" style="margin-top: 8px; width: 100%; border: 1px solid var(--border-color); background: var(--bg-subtle);">
+                儲存網址
+              </button>
+            </div>
+          </details>
+        </div>
+      </aside>
+
+    </section>
+
+  </main>
+
+  <script src="js/menu-data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
